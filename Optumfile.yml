@@ -1,0 +1,16 @@
+apiVersion: v1
+metadata:
+  # Required Properties
+  askId: UHGWM110-025452
+  caAgileId: 366199378300ud
+  projectKey: com.optum.ecp.core:authorization-service-cache
+  projectFriendlyName: authorization-service-cache
+  projectName: authorization-service-cache
+  componentType: code
+  # Sonar Properties
+  targetQG: GATE_08
+  # Fortify properties
+  translateExclusions: src/test/**/*
+  scanType: cloud
+  scarProjectVersion: authorization-service-cache
+  scarProjectName: ECP_UHGWM110-025452

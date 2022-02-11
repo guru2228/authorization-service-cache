@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;INIT=runscript from 'src/test/resources/create-jsonb-type.sql'\;runscript from 'src/test/resources/test-data.sql'
+    username: sa
+    password:
+    hikari:
+      connection-timeout: 20000
+      auto-commit: true
+      minimum-idle: 1
+      maximum-pool-size: 5
+      idle-timeout: 300000
+      max-lifetime: 2000000
+      pool-name: user-mgmt-mapstore-test
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    database: POSTGRESQL
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+
+
+datasource:
+  driver-class-name: org.h2.Driver
+  hikari:
+    auto-commit: true
+    connection-timeout: 15000
+    idle-timeout: 300000
+    max-lifetime: 1800000
+    maximum-pool-size: 10
+    minimum-idle: 5
+    pool-name: user-mgmt-mapstore
+  password:
+  url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;INIT=runscript from 'src/test/resources/create-jsonb-type.sql'\;runscript from 'src/test/resources/test-data.sql'
+  username: sa
+jpa:
+  database: POSTGRESQL
+  database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+  hibernate:
+    ddl-auto: update
+  show-sql: true

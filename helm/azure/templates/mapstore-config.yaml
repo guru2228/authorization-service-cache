@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "hazelcast.fullname" . }}-mapstore-configuration
+  labels:
+    app.kubernetes.io/name: {{ template "hazelcast.name" . }}
+    helm.sh/chart: {{ template "hazelcast.chart" . }}
+    app.kubernetes.io/instance: "{{ .Release.Name }}"
+    app.kubernetes.io/managed-by: "{{ .Release.Service }}"
+data:
+
+  SPRING_DATASOURCE_URL: {{ quote .Values.spring.datasource.url }}
+  SPRING_DATASOURCE_HIKARI_CONNECTIONTIMEOUT: {{ quote .Values.spring.datasource.hikari.connectionTimeout }}
+  SPRING_DATASOURCE_HIKARI_IDLETIMEOUT: {{ quote .Values.spring.datasource.hikari.idleTimeout }}
+  SPRING_DATASOURCE_HIKARI_MAXLIFETIME: {{ quote .Values.spring.datasource.hikari.maxLifetime }}
+  SPRING_DATASOURCE_HIKARI_MAXIMUMPOOLSIZE: {{ quote .Values.spring.datasource.hikari.maximumPoolSize }}
+  SPRING_DATASOURCE_HIKARI_MINUMUMIDLE: {{ quote .Values.spring.datasource.hikari.minimumIdle }}

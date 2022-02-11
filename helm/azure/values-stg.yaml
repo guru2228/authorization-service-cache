@@ -1,0 +1,175 @@
+comodoHostPrefix: dev
+tenant: ecp
+namespace: core
+image:
+  repository: "ecpstgacrcommon.azurecr.io/authorization-service-cache"
+spring:
+  profiles:
+    active: default,cloud
+  datasource:
+    url: jdbc:postgresql://stage-ecp-user-management-postgres-server-fs.postgres.database.azure.com:5432/user-management?sslmode=require
+    hikari:
+      connectionTimeout: "15000"  # maximum time we will wait for a connection from the pool (15 seconds)
+      idleTimeout: "300000"       # maximum time a connection is allowed to sit idle in the pool (5 minutes)
+      maxLifetime: "1800000"      # maximum lifetime of a connection in the pool before being re-created (30 minutes)
+      maximumPoolSize: 10         # maximum size that the pool is allowed to reach, including both idle and in-use connections
+      minimumIdle: 5              # minimum number of idle connections in the pool
+
+cluster:
+  # memberCount is the number Hazelcast members
+  memberCount: 8
+mancenter:
+  enabled: true
+
+hazelcast:
+  licenseKeySecretName: hz-license-key-secret
+  #licenseKey:
+  yaml:
+    hazelcast:
+      cluster-name: dev
+      network:
+        join:
+          multicast:
+            enabled: false
+          kubernetes:
+            enabled: true
+            service-name: authorization-service-cache
+            namespace: core
+        rest-api:
+          enabled: true
+      map:
+        users:
+          backup-count: 1
+          async-backup-count: 2
+          statistics-enabled: true
+          read-backup-data: true
+          eviction:
+            eviction-policy: LRU
+            max-size-policy: PER_NODE
+            size: 9000
+          merge-policy:
+            batch-size: 100
+            class-name: PutIfAbsentMergePolicy
+          map-store:
+            enabled: true
+            initial-mode: LAZY
+            class-name: com.optum.ecp.auth.mapstore.UserMapStore
+            write-delay-seconds: 5
+            write-batch-size: 1000
+            write-coalescing: true
+            properties:
+              spring.datasource.driver-class-name: org.postgresql.Driver
+              spring.datasource.hikari.auto-commit: true
+              spring.datasource.hikari.connection-timeout: 15000
+              spring.datasource.hikari.idle-timeout: 300000
+              spring.datasource.hikari.max-lifetime: 1800000
+              spring.datasource.hikari.maximum-pool-size: 10
+              spring.datasource.hikari.minimum-idle: 5
+              spring.datasource.hikari.pool-name: user-mgmt-mapstore
+              spring.jpa.database: POSTGRESQL
+              spring.jpa.database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+              spring.jpa.hibernate.ddl-auto: update
+              spring.jpa.show-sql: true
+        user-roles:
+          backup-count: 1
+          async-backup-count: 2
+          statistics-enabled: true
+          read-backup-data: true
+          eviction:
+            eviction-policy: LRU
+            max-size-policy: PER_NODE
+            size: 9000
+          merge-policy:
+            batch-size: 100
+            class-name: PutIfAbsentMergePolicy
+          map-store:
+            enabled: true
+            initial-mode: LAZY
+            class-name: com.optum.ecp.auth.mapstore.UserRoleMapStore
+            write-delay-seconds: 60
+            write-batch-size: 1000
+            write-coalescing: true
+            properties:
+              spring.datasource.driver-class-name: org.postgresql.Driver
+              spring.datasource.hikari.auto-commit: true
+              spring.datasource.hikari.connection-timeout: 15000
+              spring.datasource.hikari.idle-timeout: 300000
+              spring.datasource.hikari.max-lifetime: 1800000
+              spring.datasource.hikari.maximum-pool-size: 10
+              spring.datasource.hikari.minimum-idle: 5
+              spring.datasource.hikari.pool-name: user-mgmt-mapstore
+              spring.jpa.database: POSTGRESQL
+              spring.jpa.database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+              spring.jpa.hibernate.ddl-auto: update
+              spring.jpa.show-sql: true
+        cli-func-role-apps:
+          backup-count: 1
+          async-backup-count: 2
+          statistics-enabled: true
+          read-backup-data: true
+          eviction:
+            eviction-policy: LRU
+            max-size-policy: PER_NODE
+            size: 9000
+          merge-policy:
+            batch-size: 100
+            class-name: PutIfAbsentMergePolicy
+          map-store:
+            enabled: true
+            initial-mode: LAZY
+            class-name: com.optum.ecp.auth.mapstore.ApplicationRoleMapStore
+            write-delay-seconds: 60
+            write-batch-size: 1000
+            write-coalescing: true
+            properties:
+              spring.datasource.driver-class-name: org.postgresql.Driver
+              spring.datasource.hikari.auto-commit: true
+              spring.datasource.hikari.connection-timeout: 15000
+              spring.datasource.hikari.idle-timeout: 300000
+              spring.datasource.hikari.max-lifetime: 1800000
+              spring.datasource.hikari.maximum-pool-size: 10
+              spring.datasource.hikari.minimum-idle: 5
+              spring.datasource.hikari.pool-name: user-mgmt-mapstore
+              spring.jpa.database: POSTGRESQL
+              spring.jpa.database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+              spring.jpa.hibernate.ddl-auto: update
+              spring.jpa.show-sql: true
+        user-sign-on:
+          backup-count: 1
+          async-backup-count: 0
+          statistics-enabled: true
+          read-backup-data: true
+          eviction:
+            eviction-policy: LRU
+            max-size-policy: PER_NODE
+            size: 9000
+          merge-policy:
+            batch-size: 100
+            class-name: PutIfAbsentMergePolicy
+          map-store:
+            enabled: true
+            initial-mode: LAZY
+            class-name: com.optum.ecp.auth.mapstore.UserSignOnMapStore
+            write-delay-seconds: 60
+            write-batch-size: 1000
+            write-coalescing: true
+            properties:
+              spring.datasource.driver-class-name: org.postgresql.Driver
+              spring.datasource.hikari.auto-commit: true
+              spring.datasource.hikari.connection-timeout: 15000
+              spring.datasource.hikari.idle-timeout: 300000
+              spring.datasource.hikari.max-lifetime: 1800000
+              spring.datasource.hikari.maximum-pool-size: 10
+              spring.datasource.hikari.minimum-idle: 5
+              spring.datasource.hikari.pool-name: user-mgmt-mapstore
+              spring.jpa.database: POSTGRESQL
+              spring.jpa.database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+              spring.jpa.hibernate.ddl-auto: update
+              spring.jpa.show-sql: true
+      hot-restart-persistence:
+        enabled: false
+        base-dir: /data/hot-restart
+        validation-timeout-seconds: 1200
+        data-load-timeout-seconds: 900
+      jet:
+        enabled: true

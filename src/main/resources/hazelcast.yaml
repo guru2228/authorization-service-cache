@@ -1,0 +1,143 @@
+hazelcast:
+  cluster-name: dev
+  map:
+    users:
+      backup-count: 1
+      async-backup-count: 2
+      statistics-enabled: true
+      read-backup-data: true
+      eviction:
+        eviction-policy: LRU
+        max-size-policy: PER_NODE
+        size: 9000
+      merge-policy:
+        batch-size: 100
+        class-name: PutIfAbsentMergePolicy
+      map-store:
+        enabled: true
+        initial-mode: LAZY
+        class-name: com.optum.ecp.auth.mapstore.UserMapStore
+        write-delay-seconds: 5
+        write-batch-size: 1000
+        write-coalescing: true
+        properties:
+          datasource.driver-class-name: org.postgresql.Driver
+          datasource.hikari.auto-commit: true
+          datasource.hikari.connection-timeout: 15000
+          datasource.hikari.idle-timeout: 300000
+          datasource.hikari.max-lifetime: 1800000
+          datasource.hikari.maximum-pool-size: 10
+          datasource.hikari.minimum-idle: 5
+          datasource.hikari.pool-name: user-mgmt-mapstore
+          datasource.password: superdooper
+          datasource.url: jdbc:postgresql://localhost:5432/MyDatabase
+          datasource.username: admin
+          jpa.database: POSTGRESQL
+          jpa.database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+          jpa.hibernate.ddl-auto: update
+          jpa.show-sql: true
+    user-roles:
+      backup-count: 1
+      async-backup-count: 2
+      statistics-enabled: true
+      read-backup-data: true
+      eviction:
+        eviction-policy: LRU
+        max-size-policy: PER_NODE
+        size: 9000
+      merge-policy:
+        batch-size: 100
+        class-name: PutIfAbsentMergePolicy
+      map-store:
+        enabled: true
+        initial-mode: LAZY
+        class-name: com.optum.ecp.auth.mapstore.UserRoleMapStore
+        write-delay-seconds: 60
+        write-batch-size: 1000
+        write-coalescing: true
+        properties:
+          datasource.driver-class-name: org.postgresql.Driver
+          datasource.hikari.auto-commit: true
+          datasource.hikari.connection-timeout: 15000
+          datasource.hikari.idle-timeout: 300000
+          datasource.hikari.max-lifetime: 1800000
+          datasource.hikari.maximum-pool-size: 10
+          datasource.hikari.minimum-idle: 5
+          datasource.hikari.pool-name: user-mgmt-mapstore
+          datasource.password: superdooper
+          datasource.url: jdbc:postgresql://localhost:5432/MyDatabase
+          datasource.username: admin
+          jpa.database: POSTGRESQL
+          jpa.database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+          jpa.hibernate.ddl-auto: update
+          jpa.show-sql: true
+    cli-func-role-apps:
+      backup-count: 1
+      async-backup-count: 2
+      statistics-enabled: true
+      read-backup-data: true
+      eviction:
+        eviction-policy: LRU
+        max-size-policy: PER_NODE
+        size: 9000
+      merge-policy:
+        batch-size: 100
+        class-name: PutIfAbsentMergePolicy
+      map-store:
+        enabled: true
+        initial-mode: LAZY
+        class-name: com.optum.ecp.auth.mapstore.ApplicationRoleMapStore
+        write-delay-seconds: 60
+        write-batch-size: 1000
+        write-coalescing: true
+        properties:
+          datasource.driver-class-name: org.postgresql.Driver
+          datasource.hikari.auto-commit: true
+          datasource.hikari.connection-timeout: 15000
+          datasource.hikari.idle-timeout: 300000
+          datasource.hikari.max-lifetime: 1800000
+          datasource.hikari.maximum-pool-size: 10
+          datasource.hikari.minimum-idle: 5
+          datasource.hikari.pool-name: user-mgmt-mapstore
+          datasource.password: superdooper
+          datasource.url: jdbc:postgresql://localhost:5432/MyDatabase
+          datasource.username: admin
+          jpa.database: POSTGRESQL
+          jpa.database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+          jpa.hibernate.ddl-auto: update
+          jpa.show-sql: true
+    user-sign-on:
+      backup-count: 1
+      async-backup-count: 0
+      statistics-enabled: true
+      read-backup-data: true
+      eviction:
+        eviction-policy: LRU
+        max-size-policy: PER_NODE
+        size: 9000
+      merge-policy:
+        batch-size: 100
+        class-name: PutIfAbsentMergePolicy
+      map-store:
+        enabled: true
+        initial-mode: LAZY
+        class-name: com.optum.ecp.auth.mapstore.UserSignOnMapStore
+        write-delay-seconds: 60
+        write-batch-size: 1000
+        write-coalescing: true
+        properties:
+          datasource.driver-class-name: org.postgresql.Driver
+          datasource.hikari.auto-commit: true
+          datasource.hikari.connection-timeout: 15000
+          datasource.hikari.idle-timeout: 300000
+          datasource.hikari.max-lifetime: 1800000
+          datasource.hikari.maximum-pool-size: 10
+          datasource.hikari.minimum-idle: 5
+          datasource.hikari.pool-name: user-mgmt-mapstore
+          datasource.password: superdooper
+          datasource.url: jdbc:postgresql://localhost:5432/MyDatabase
+          datasource.username: admin
+          jpa.database: POSTGRESQL
+          jpa.database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+          jpa.hibernate.ddl-auto: update
+          jpa.show-sql: true

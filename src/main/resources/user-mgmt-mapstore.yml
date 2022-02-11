@@ -1,0 +1,19 @@
+datasource:
+    driver-class-name: org.postgresql.Driver
+    hikari:
+        auto-commit: true
+        connection-timeout: 15000
+        idle-timeout: 300000
+        max-lifetime: 1800000
+        maximum-pool-size: 10
+        minimum-idle: 5
+        pool-name: user-mgmt-mapstore
+    password: CHANGE
+    url: jdbc:postgresql://stage-ecp-user-management-postgres-server.postgres.database.azure.com:5432/user-management?sslmode=require
+    username: CHANGE
+jpa:
+    database: POSTGRESQL
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+    hibernate:
+        ddl-auto: update
+    show-sql: true

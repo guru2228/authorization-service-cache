@@ -1,0 +1,450 @@
+fullnameOverride: authorization-service-cache
+namespace: core
+## Hazelcast image version
+## ref: https://hub.docker.com/r/hazelcast/hazelcast-enterprise-kubernetes/tags/
+##
+imageTag: "02072022"
+image:
+  # repository is the Hazelcast image name
+  repository: "ecpacrcommon.azurecr.io/ecp/authorization-service-cache"
+  # pullPolicy is the Docker image pull policy
+  # It's recommended to change this to 'Always' if the image tag is 'latest'
+  # ref: http://kubernetes.io/docs/user-guide/images/#updating-images
+  #
+  pullPolicy: IfNotPresent
+  # pullSecrets is an array of docker-registry secret names
+  # Secrets must be manually created in the namespace.
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  # pullSecrets:
+  # - myRegistryKeySecretName
+
+# Cluster settings
+cluster:
+  # memberCount is the number Hazelcast members
+  memberCount: 3
+
+# Required for IBM CP4MCM deployment
+mcm:
+  enabled: false
+  # Base URL of MCM OpenShift must be defined for CP4MCM versions before 2.3 to enable Management Center at Navigation Menu.
+  # baseURL: apps.yellow-22.dev.multicloudops.io
+
+# Hazelcast properties
+hazelcast:
+  # enabled is a flag to enable Hazelcast application
+  enabled: true
+  # licenseKey is the Hazelcast Enterprise License Key (always required to run Hazelcast Enterprise)
+  licenseKey:
+  # licenseKeySecretName is the name of the secret where the Hazelcast Enterprise License Key is stored (can be used instead of licenseKey)
+  # licenseKeySecretName:
+  # updateClusterVersionAfterRollingUpgrade is a flag used to automatically update the Hazelcast cluster version of the rolling upgrade procedure
+  updateClusterVersionAfterRollingUpgrade: true
+  # javaOpts are additional JAVA_OPTS properties for Hazelcast member
+  javaOpts:
+  # loggingLevel is the level of Hazelcast logs (OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE and ALL)
+  # loggingLevel:
+  # existingConfigMap defines a ConfigMap which contains Hazelcast configuration file(s) that are used instead of hazelcast.yaml configuration below
+  # existingConfigMap:
+  # yaml is the Hazelcast YAML configuration file
+  yaml:
+    hazelcast:
+      network:
+        join:
+          multicast:
+            enabled: false
+          kubernetes:
+            enabled: true
+            service-name: ${serviceName}
+            namespace: ${namespace}
+        rest-api:
+          enabled: true
+      hot-restart-persistence:
+        enabled: ${hazelcast.hotRestart}
+        base-dir: /data/hot-restart
+        validation-timeout-seconds: 1200
+        data-load-timeout-seconds: 900
+        # https://github.com/hazelcast/hazelcast/issues/19373
+        # auto-remove-stale-data: true
+      jet:
+        enabled: ${hz.jet.enabled}
+  # configurationFiles are any additional Hazelcast configuration files
+  # configurationFiles:
+
+# annotations is an array of metadata for Hazelcast IMDG Statefulset
+annotations: {}
+
+# affinity specifies the affinity/anti-affinity of different pods. The commented out
+# example below shows how you could ensure your hazelcast pods are scheduled on
+# different Kubernetes nodes
+affinity:
+#  podAntiAffinity:
+#    requiredDuringSchedulingIgnoredDuringExecution:
+#    - labelSelector:
+#        matchExpressions:
+#        - key: app.kubernetes.io/name
+#          operator: In
+#          values:
+#          - hazelcast
+#        - key: role
+#          operator: In
+#          values:
+#          - hazelcast
+#      topologyKey: kubernetes.io/hostname
+
+# tolerations enable Hazelcast PODs to be able to run on nodes with taints
+# tolerations:
+
+# nodeSelector is an array of Hazelcast Node labels for POD assignments
+# ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+nodeSelector: {}
+
+# hostPort is a port under which Hazelcast PODs are exposed on the host machines
+# hostPort:
+
+# customPorts is the whole ports section to customize how Hazelcast container ports are defined
+# customPorts:
+
+# labels to add to the pod container metadata
+podLabels: {}
+#  key: value
+
+# specify a custom priority class name
+priorityClassName: ""
+
+gracefulShutdown:
+  enabled: true
+  maxWaitSeconds: 600
+
+# Hazelcast Liveness probe
+livenessProbe:
+  # enabled is a flag to used to enable liveness probe
+  enabled: true
+  # initialDelaySeconds is a delay before liveness probe is initiated
+  initialDelaySeconds: 30
+  # periodSeconds decides how often to perform the probe
+  periodSeconds: 10
+  # timeoutSeconds decides when the probe times out
+  timeoutSeconds: 10
+  # successThreshold is the minimum consecutive successes for the probe to be considered successful after having failed
+  successThreshold: 1
+  # failureThreshold is the minimum consecutive failures for the probe to be considered failed after having succeeded
+  failureThreshold: 10
+  # url path that will be called to check liveness
+  path: /hazelcast/health/node-state
+  # port that will be used in liveness probe calls
+  # port:
+  # HTTPS or HTTP scheme
+  scheme: HTTP
+
+# Hazelcast Readiness probe
+readinessProbe:
+  # enabled is a flag to used to enable readiness probe
+  enabled: true
+  # initialDelaySeconds is a delay before readiness probe is initiated
+  initialDelaySeconds: 30
+  # periodSeconds decides how often to perform the probe
+  periodSeconds: 10
+  # timeoutSeconds decides when the probe times out
+  timeoutSeconds: 10
+  # successThreshold is the minimum consecutive successes for the probe to be considered successful after having failed
+  successThreshold: 1
+  # failureThreshold is the minimum consecutive failures for the probe to be considered failed after having succeeded
+  failureThreshold: 10
+  # url path that will be called to check readiness
+  path: /hazelcast/health/node-state
+  # port that will be used in readiness probe calls
+  # port:
+  # HTTPS or HTTP scheme
+  scheme: HTTP
+
+# Configure resource requests and limits
+# ref: http://kubernetes.io/docs/user-guide/compute-resources/
+#
+resources:
+  requests:
+    memory: 2048Mi
+    cpu: 2
+  limits:
+    memory: 4096Mi
+    cpu: 4
+
+# Hazelcast Service properties
+service:
+  # Specifies whether a Service should be created
+  create: true
+  # The name of the Service to use.
+  # The name is used for service discovery by Hazelcast K8S discovery plugin.
+  # If not set and create is true, a name is generated using the fullname template
+  name: authorization-service-cache
+  # type defines the Kubernetes service type ('ClusterIP', 'LoadBalancer', or 'NodePort')
+  type: ClusterIP
+  # port is the Kubernetes service port
+  port: 5701
+  # Static NodePort, if set.
+  # nodePort: 30100
+
+  # clusterIP set to None makes the service headless
+  # It is required if DNS Lookup is used (https://github.com/hazelcast/hazelcast-kubernetes#dns-lookup)
+  clusterIP: "None"
+  # service annotations for the hazelcast service
+  annotations: {}
+
+
+# Role-based Access Control
+rbac:
+  # Specifies whether RBAC resources should be created
+  # It is not required if DNS Lookup is used (https://github.com/hazelcast/hazelcast-kubernetes#dns-lookup)
+  create: true
+
+serviceAccount:
+  # Specifies whether a ServiceAccount should be created
+  create: true
+  # Whether the token associated with the service account should be automatically mounted
+  automountToken: true
+  # The name of the ServiceAccount to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+# Security Context properties
+securityContext:
+  # enabled is a flag to enable Security Context
+  enabled: true
+  # runAsUser is the user ID used to run the container
+  runAsUser: 65534
+  # fsGroup is the group ID associated with the container
+  fsGroup: 65534
+  # readOnlyRootFilesystem is a flag to enable readOnlyRootFilesystem for the Hazelcast security context
+  readOnlyRootFilesystem: true
+
+# Hazelcast Hot Restart persistence feature
+hotRestart:
+  # enabled is a flag to enabled Hot Restart feature
+  enabled: false
+  # existingClaim is a name of the existing Persistence Volume Claim that will be used for the Hot Restart persistence
+  # if not defined, a new Persistent Volume Claim is created with the default name
+  # existingClaim:
+  # accessModes defines the access modes for the created Persistent Volume Claim
+  accessModes:
+  - ReadWriteOnce
+  # size is the size of Persistent Volume Claim
+  size: 8Gi
+  # hostPath is the path of the node machine directory that is used for persistent storage
+  # if defined, it's used instead of Persistent Volume Claim
+  # hostPath:
+
+# Hazelcast Jet Engine
+jet:
+  # enabled is a flag to enabled Jet engine
+  enabled: true
+
+# Allows to enable a Prometheus to scrape pods, implemented for Hazelcast version >= 3.12 (or 'latest')
+metrics:
+  enabled: true
+  service:
+    type: ClusterIP
+    port: 8080
+    portName: metrics
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/path: "/metrics"
+      prometheus.io/port: "8080"
+
+# secretsMountName is the secret name that is mounted as '/data/secrets/' (e.g. with keystore/trustore files)
+# secretsMountName:
+
+# customVolume is the configuration for any volume mounted as '/data/custom/' and exposed to classpath (e.g. to mount a volume with custom JARs)
+# customVolume:
+
+# externalVolume is the configuration for any volume mounted as '/data/external/'
+# externalVolume:
+
+# Init containers to add to the Hazelcast statefulset's pod spec.
+initContainers: []
+  # - name: init-container
+  #   image: alpine
+  #   command: ['/bin/sh', '-c', 'date']
+
+# Sidecar containers to add to the Hazelcast statefulset's pod spec.
+sidecarContainers: []
+  # - name: sidecar-container
+  #   image: alpine
+  #   command: ['/bin/sh', '-c', 'while true; do date; sleep 1; done']
+
+# Additional Environment variables
+env: []
+  # - name: DB_USERNAME
+  #   valueFrom:
+  #     secretKeyRef:
+  #       key: db-username
+  #       name: servicename-db-creds
+
+# Hazelcast Management Center application properties
+mancenter:
+  # enabled is a flag to enable Management Center application
+  enabled: true
+  ## Hazelcast Management Center image version
+  ## ref: https://hub.docker.com/r/hazelcast/management-center/tags/
+  ##
+  image:
+    # repository is the Hazelcast Management Center image name
+    repository: "hazelcast/management-center"
+    # tag is the Hazelcast Management Center image tag
+    tag: "5.0"
+    # pullPolicy is the Docker image pull policy
+    # It's recommended to change this to 'Always' if the image tag is 'latest'
+    # ref: http://kubernetes.io/docs/user-guide/images/#updating-images
+    #
+    pullPolicy: IfNotPresent
+    # pullSecrets is an array of docker-registry secret names
+    # Secrets must be manually created in the namespace.
+    # ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    # pullSecrets:
+    # - myRegistryKeySecretName
+
+  # Dev mode is for the Hazelcast clusters running on your local for development
+  # or evaluation purposes and it provides quick access to the Management Center without requiring any security credentials
+  devMode:
+    enabled: false
+
+  # ingress configuration for mancenter
+  ingress:
+    enabled: true
+    urlAbbrev: auth-service-cache-mancenter
+    annotations: {
+      "kubernetes.io/ingress.class" : "nginx",
+      "nginx.ingress.kubernetes.io/rewrite-target" : "/$1"
+    }
+    # hosts:
+    # - hazelcast-mancenter.cluster.domain
+    # tls:
+    # - secretName: hazelcast-ingress-tls
+    #   hosts:
+    #   - hazelcast-mancenter.cluster.domain
+
+  # ssl is a flag to enable SSL for Management Center
+  ssl: false
+  # javaOpts are additional JAVA_OPTS properties for Hazelcast Management Center
+  javaOpts:
+  # loggingLevel is the level of Management Center logs (OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE and ALL)
+  # loggingLevel:
+
+  # contextPath is the value for the MC_CONTEXT_PATH environment variable, thus overriding the default context path for Hazelcast Management Center
+  # ref: https://hub.docker.com/r/hazelcast/management-center/
+  contextPath: /auth-service-cache-mancenter
+
+  # licenseKey is the license key for Hazelcast Management Center
+  # if not provided, it can be filled in the Management Center web interface
+  licenseKey:
+  # licenseKeySecretName is the name of the secret where the Hazelcast Management Center License Key is stored (can be used instead of licenseKey)
+  # licenseKeySecretName:
+
+  # adminCredentialsSecretName is Kubernetes Secret Name for admin credentials. Secret has to contain `username` and `password` literals. please check Management Center documentation for password requirements
+  # adminCredentialsSecretName:
+
+
+  # existingConfigMap defines a ConfigMap which contains Hazelcast Client configuration file(s) that are used instead of hazelcast-client.yaml configuration below
+  # existingConfigMap:
+  # yaml is the Hazelcast Client YAML configuration file
+  yaml:
+    hazelcast-client:
+      network:
+        kubernetes:
+          enabled: true
+          service-name: authorization-service-cache
+          namespace: core
+
+  # annotations is an array of metadata for Management Center Statefulset
+  annotations: {}
+
+  # affinity specifies the Management Center affinity/anti-affinity of different pods
+  # affinity:
+
+  # tolerations enable Management Center POD to be able to run on nodes with taints
+  # tolerations:
+
+  # nodeSelector is an array of Hazelcast Management Center Node labels for POD assignments
+  # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+  nodeSelector: {}
+
+  # labels to add to the mancenter pod container metadata
+  podLabels: {}
+  #  key: value
+
+  # priority class name for mancenter
+  priorityClassName: ""
+
+  # Configure resource requests and limits
+  # ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  #
+  resources:
+    requests:
+      memory: 1024Mi
+      cpu: 100m
+    limits:
+      memory: 2048Mi
+      cpu: 1000m
+
+  # Management Center persistence properties
+  persistence:
+    # enabled is a flag to enable persistence for Management Center
+    enabled: true
+    # existingClaim is a name of the existing Persistence Volume Claim that will be used for persistence
+    # if not defined, a new Persistent Value Claim is created with the default name
+    # existingClaim:
+    # accessModes defines the access modes for the created Persistent Volume Claim
+    accessModes:
+    - ReadWriteOnce
+    # size is the size of Persistent Volume Claim
+    size: 8Gi
+    # storageClass defines the storage class used for Management Center. Read more at: https://kubernetes.io/docs/concepts/storage/storage-classes/
+    # storageClass:
+
+  # Hazelcast Management Center Service properties
+  service:
+    # type defines the Kubernetes service type ('ClusterIP', 'LoadBalancer', or 'NodePort')
+    type: ClusterIP
+    # port is the Kubernetes service port
+    port: 8080
+    # service https port
+    httpsPort: 443
+    # service annotations for management center
+    annotations: {}
+
+  # customVolume is the configuration for any volume mounted as '/data/custom/' (e.g. to mount a volume with custom JARs)
+  # customVolume:
+
+  # Hazelcast Management Center Liveness probe
+  livenessProbe:
+    # enabled is a flag to used to enable liveness probe
+    enabled: true
+    # initialDelaySeconds is a delay before liveness probe is initiated
+    initialDelaySeconds: 30
+    # periodSeconds decides how often to perform the probe
+    periodSeconds: 10
+    # timeoutSeconds decides when the probe times out
+    timeoutSeconds: 5
+    # successThreshold is the minimum consecutive successes for the probe to be considered successful after having failed
+    successThreshold: 1
+    # failureThreshold is the minimum consecutive failures for the probe to be considered failed after having succeeded
+    failureThreshold: 3
+  # Hazelcast Management Center Readiness probe
+  readinessProbe:
+    # enabled is a flag to used to enable readiness probe
+    enabled: true
+    # initialDelaySeconds is a delay before readiness probe is initiated
+    initialDelaySeconds: 30
+    # periodSeconds decides how often to perform the probe
+    periodSeconds: 10
+    # timeoutSeconds decides when the probe times out
+    timeoutSeconds: 1
+    # successThreshold is the minimum consecutive successes for the probe to be considered successful after having failed
+    successThreshold: 1
+    # failureThreshold is the minimum consecutive failures for the probe to be considered failed after having succeeded
+    failureThreshold: 3
+
+  # Cluster config creation will create the connection to the Hazelcast cluster based on the yaml.hazelcast-client
+  clusterConfig:
+    create: true
+
+  # secretsMountName is the secret name that is mounted as '/data/secrets/' (e.g. with keystore/trustore files)
+  # secretsMountName:
